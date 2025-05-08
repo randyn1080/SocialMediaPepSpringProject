@@ -21,8 +21,8 @@ import java.util.List;
  */
 @RestController
 public class SocialMediaController {
-    private AccountService accountService;
-    private MessageService messageService;
+    private final AccountService accountService;
+    private final MessageService messageService;
 
     /**
      * Constructs a new SocialMediaController instance with dependencies on AccountService and MessageService.
