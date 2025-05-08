@@ -28,10 +28,12 @@ public class SocialMediaController {
     }
 
     @PostMapping("register")
-    public ResponseEntity<String> register(@RequestBody Account newAccount) {
-        accountService.registerAccount(newAccount);
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body("Account created successfully");
+    public ResponseEntity<Account> register(@RequestBody Account newAccount) {
+        Account registeredAccount = accountService.registerAccount(newAccount);
+        if (registeredAccount == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+        }
+        return ResponseEntity.ok(registeredAccount);
     }
 
 }
