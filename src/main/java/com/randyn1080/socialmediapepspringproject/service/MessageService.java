@@ -6,6 +6,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.randyn1080.socialmediapepspringproject.entity.*;
 
+import java.util.List;
+
 @Service
 public class MessageService {
     private final MessageRepository messageRepository;
@@ -38,5 +40,9 @@ public class MessageService {
 
         // save the message and return it with the generated ID
         return messageRepository.save(message);
+    }
+
+    public List<Message> getAllMessages() {
+        return messageRepository.findAll();
     }
 }

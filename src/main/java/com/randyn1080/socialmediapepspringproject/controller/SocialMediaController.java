@@ -6,9 +6,12 @@ import com.randyn1080.socialmediapepspringproject.service.AccountService;
 import com.randyn1080.socialmediapepspringproject.service.MessageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 @RestController
 public class SocialMediaController {
@@ -37,6 +40,12 @@ public class SocialMediaController {
     public ResponseEntity<Message> createMessage(@RequestBody Message message) {
         Message newMessage = messageService.createMessage(message);
         return ResponseEntity.ok(newMessage);
+    }
+
+    @GetMapping("messages")
+    public ResponseEntity<List<Message>> findAllMessages() {
+        List<Message> messages = messageService.getAllMessages();
+        return ResponseEntity.ok(messages);
     }
 
 }
