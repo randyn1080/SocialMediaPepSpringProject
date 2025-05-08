@@ -7,8 +7,8 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 /**
- * MessageRepository is a Spring Data JPA repository interface for managing Message entities.
- * It provides default CRUD operations and supports custom queries for retrieving messages.
+ * Repository interface for Message entity operations.
+ * Extends JpaRepository to provide standard data access operations.
  */
 @Repository
 public interface MessageRepository extends JpaRepository<Message, Integer> {

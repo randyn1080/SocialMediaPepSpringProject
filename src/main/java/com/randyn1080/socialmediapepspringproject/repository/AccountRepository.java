@@ -5,8 +5,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 /**
- * The AccountRepository interface facilitates interactions with the database for Account entities.
- * It extends JpaRepository to provide default CRUD operations and offers custom query methods.
+ * Repository interface for Account entity operations.
+ * Extends JpaRepository to provide standard data access operations.
  */
 @Repository
 public interface AccountRepository extends JpaRepository<Account, Integer> {

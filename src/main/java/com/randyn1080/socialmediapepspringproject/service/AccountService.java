@@ -63,12 +63,15 @@ public class AccountService {
     }
 
     /**
-     * Authenticates a user by validating the provided account credentials and checking against stored accounts.
-     * If the credentials are valid, the authenticated account is returned.
+     * Authenticates a user by validating the provided credentials against existing accounts.
      *
-     * @param account the account containing the username and password for authentication
-     * @return the authenticated account if the credentials are valid
-     * @throws AuthenticationFailedException if the provided username or password is blank or invalid
+     * Validation rules:
+     * - Username and password cannot be blank
+     * - Credentials must match an existing account in the system
+     *
+     * @param account the account credentials for login (username and password)
+     * @return the authenticated account details including accountId if successful
+     * @throws AuthenticationFailedException if the credentials are invalid or do not match any account
      */
     public Account login(Account account) {
         // ensure fields are not null or empty
