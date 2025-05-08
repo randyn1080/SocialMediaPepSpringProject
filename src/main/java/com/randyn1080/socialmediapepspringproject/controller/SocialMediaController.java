@@ -52,4 +52,9 @@ public class SocialMediaController {
         return ResponseEntity.ok(message);
     }
 
+    @DeleteMapping("messages/{messageId}")
+    public ResponseEntity<Integer> deleteMessageById(@PathVariable Integer messageId) {
+        Integer rowsAffected = messageService.deleteMessageById(messageId);
+        return ResponseEntity.ok(rowsAffected);
+    }
 }

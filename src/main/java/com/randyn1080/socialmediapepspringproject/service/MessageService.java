@@ -49,4 +49,12 @@ public class MessageService {
     public Message getMessageById(Integer messageId) {
         return messageRepository.findById(messageId).orElse(null);
     }
+
+    public Integer deleteMessageById(Integer messageId) {
+        if (messageRepository.existsById(messageId)) {
+            messageRepository.deleteById(messageId);
+            return 1;
+        }
+        return null;
+    }
 }
