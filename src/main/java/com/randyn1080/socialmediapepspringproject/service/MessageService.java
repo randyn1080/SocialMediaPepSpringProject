@@ -57,4 +57,30 @@ public class MessageService {
         }
         return null;
     }
+
+    public Integer updateMessageTextById(Integer messageId, String newMessageText) {
+        // find the message
+        Message existingMessage = messageRepository.findById(messageId).orElse(null);
+
+        // check to see if message ID exists
+        if (existingMessage == null) {
+            throw new InvalidMessageException("Message with ID: " + messageId + " does not exist");
+        }
+
+        // check to see if the message text is valid
+        if (newMessageText == null || newMessageText.isBlank()) {
+            throw new InvalidMessageException("Message text cannot be blank");
+        }
+        if (newMessageText.length() > 255) {
+            throw new InvalidMessageException("Message text must be less than 255 characters");
+        }
+
+        // update message text
+        existingMessage.setMessageText(newMessageText);
+
+        // save the message
+        messageRepository.save(existingMessage);
+
+        return 1;
+    }
 }
