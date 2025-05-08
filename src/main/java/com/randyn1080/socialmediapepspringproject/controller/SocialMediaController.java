@@ -7,6 +7,8 @@ import com.randyn1080.socialmediapepspringproject.service.MessageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
@@ -21,6 +23,8 @@ import java.util.List;
  */
 @RestController
 public class SocialMediaController {
+    private static final Logger logger = LoggerFactory.getLogger(SocialMediaController.class);
+
     private final AccountService accountService;
     private final MessageService messageService;
 
@@ -37,6 +41,7 @@ public class SocialMediaController {
     public SocialMediaController(AccountService accountService, MessageService messageService) {
         this.accountService = accountService;
         this.messageService = messageService;
+        logger.info("SocialMediaController initialized");
     }
 
     /**
@@ -55,7 +60,9 @@ public class SocialMediaController {
      */
     @PostMapping("register")
     public ResponseEntity<Account> register(@RequestBody Account newAccount) {
+        logger.info("Received registration request for username: {}", newAccount.getUsername());
         Account registeredAccount = accountService.registerAccount(newAccount);
+        logger.info("Successfully registered user with ID: {}", registeredAccount.getAccountId());
         return ResponseEntity.ok(registeredAccount);
     }
 
@@ -74,7 +81,9 @@ public class SocialMediaController {
      */
     @PostMapping("login")
     public ResponseEntity<Account> login(@RequestBody Account account) {
+        logger.info("Received login request for username: {}", account.getUsername());
         Account loggedInAccount = accountService.login(account);
+        logger.info("Login successful for user ID: {}", loggedInAccount.getAccountId());
         return ResponseEntity.ok(loggedInAccount);
     }
 
@@ -93,7 +102,9 @@ public class SocialMediaController {
      */
     @PostMapping("messages")
     public ResponseEntity<Message> createMessage(@RequestBody Message message) {
+        logger.info("Received message creation request from user ID: {}", message.getPostedBy());
         Message newMessage = messageService.createMessage(message);
+        logger.info("Successfully created message with ID: {}", newMessage.getMessageId());
         return ResponseEntity.ok(newMessage);
     }
 
@@ -109,7 +120,9 @@ public class SocialMediaController {
      */
     @GetMapping("messages")
     public ResponseEntity<List<Message>> getAllMessages() {
+        logger.info("Received request to get all messages");
         List<Message> messages = messageService.getAllMessages();
+        logger.info("Returning {} messages", messages.size());
         return ResponseEntity.ok(messages);
     }
 
@@ -127,7 +140,13 @@ public class SocialMediaController {
      */
     @GetMapping("messages/{messageId}")
     public ResponseEntity<Message> getMessageById(@PathVariable Integer messageId) {
+        logger.info("Received request to get message with ID: {}", messageId);
         Message message = messageService.getMessageById(messageId);
+        if (message != null) {
+            logger.info("Found message with ID: {}", messageId);
+        } else {
+            logger.info("No message found with ID: {}", messageId);
+        }
         return ResponseEntity.ok(message);
     }
 
@@ -145,7 +164,13 @@ public class SocialMediaController {
      */
     @DeleteMapping("messages/{messageId}")
     public ResponseEntity<Integer> deleteMessageById(@PathVariable Integer messageId) {
+        logger.info("Received request to delete message with ID: {}", messageId);
         Integer rowsAffected = messageService.deleteMessageById(messageId);
+        if (rowsAffected != null && rowsAffected > 0) {
+            logger.info("Successfully deleted message with ID: {}", messageId);
+        } else {
+            logger.info("No message found to delete with ID: {}", messageId);
+        }
         return ResponseEntity.ok(rowsAffected);
     }
 
@@ -167,8 +192,10 @@ public class SocialMediaController {
     @PatchMapping("messages/{messageId}")
     public ResponseEntity<Integer> updateMessageTextById(@PathVariable Integer messageId,
                                                          @RequestBody Message message) {
+        logger.info("Received request to update message with ID: {}", messageId);
         String newMessageText = message.getMessageText();
         int rowsUpdated = messageService.updateMessageTextById(messageId, newMessageText);
+        logger.info("Successfully updated message with ID: {}", messageId);
         return ResponseEntity.ok(rowsUpdated);
     }
 
@@ -187,7 +214,9 @@ public class SocialMediaController {
      */
     @GetMapping("accounts/{accountId}/messages")
     public ResponseEntity<List<Message>> getMessagesByAccountId(@PathVariable Integer accountId) {
+        logger.info("Received request to get messages for user ID: {}", accountId);
         List<Message> messages = messageService.getMessagesByAccountId(accountId);
+        logger.info("Found {} messages for user ID: {}", messages.size(), accountId);
         return ResponseEntity.ok(messages);
     }
 }

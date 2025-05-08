@@ -6,6 +6,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.randyn1080.socialmediapepspringproject.entity.*;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.List;
 
 /**
@@ -15,6 +18,8 @@ import java.util.List;
  */
 @Service
 public class MessageService {
+    private static final Logger logger = LoggerFactory.getLogger(MessageService.class);
+
     private final MessageRepository messageRepository;
     private final AccountRepository accountRepository;
 
@@ -29,6 +34,7 @@ public class MessageService {
     public MessageService(MessageRepository messageRepository, AccountRepository accountRepository) {
         this.messageRepository = messageRepository;
         this.accountRepository = accountRepository;
+        logger.info("MessageService initialized");
     }
 
     /**
@@ -44,25 +50,35 @@ public class MessageService {
      */
     public Message createMessage(Message message) {
         String messageText = message.getMessageText();
+        Integer postedBy = message.getPostedBy();
+
+        logger.debug("Validating message for creation. Posted by user ID: {}", postedBy);
+
         // check if the text is valid
         if (messageText == null || messageText.isBlank()) {
+            logger.warn("Message creation failed: Text is blank. User ID: {}", postedBy);
             throw new InvalidMessageException("Message text cannot be blank");
         }
 
         // check for length
         if (messageText.length() > 255) {
+            logger.warn("Message creation failed: Text too long ({} chars). User ID: {}",
+                    messageText.length(), postedBy);
             throw new InvalidMessageException("Message text must be less than 255 characters");
         }
 
         // check if the account exists
-        boolean accountExists = accountRepository.existsById(message.getPostedBy());
-
+        boolean accountExists = accountRepository.existsById(postedBy);
         if (!accountExists) {
+            logger.warn("Message creation failed: Account does not exist. User ID: {}", postedBy);
             throw new InvalidMessageException("Account does not exist");
         }
 
         // save the message and return it with the generated ID
-        return messageRepository.save(message);
+        logger.debug("Message validation successful, proceeding with creation");
+        Message savedMessage = messageRepository.save(message);
+        logger.info("Message created successfully with ID: {}", savedMessage.getMessageId());
+        return savedMessage;
     }
 
     /**
@@ -70,7 +86,10 @@ public class MessageService {
      * @return a list of all messages in the database, or an empty list if no messages exist.
      */
     public List<Message> getAllMessages() {
-        return messageRepository.findAll();
+        logger.debug("Retrieving all messages");
+        List<Message> messages = messageRepository.findAll();
+        logger.debug("Retrieved {} messages", messages.size());
+        return messages;
     }
 
     /**
@@ -82,7 +101,17 @@ public class MessageService {
      * @return the message with the specified ID, or null if no such message exists
      */
     public Message getMessageById(Integer messageId) {
-        return messageRepository.findById(messageId).orElse(null);
+        logger.debug("Retrieving message with ID: {}", messageId);
+
+        Message message = messageRepository.findById(messageId).orElse(null);
+
+        if (message != null) {
+            logger.debug("Retrieved message with ID: {}", messageId);
+        } else {
+            logger.debug("No message found with ID: {}", messageId);
+        }
+
+        return message;
     }
 
     /**
@@ -94,10 +123,14 @@ public class MessageService {
      * @return 1 if the message was successfully deleted, or null if the message does not exist.
      */
     public Integer deleteMessageById(Integer messageId) {
+        logger.debug("Attempting to delete message with ID: {}", messageId);
+
         if (messageRepository.existsById(messageId)) {
             messageRepository.deleteById(messageId);
+            logger.info("Deleted message with ID: {}", messageId);
             return 1;
         }
+        logger.debug("No message found to delete with ID: {}", messageId);
         return null;
     }
 
@@ -114,27 +147,35 @@ public class MessageService {
      * @throws InvalidMessageException if the message doesn't exist or the new text is invalid
      */
     public Integer updateMessageTextById(Integer messageId, String newMessageText) {
+        logger.debug("Attempting to update message with ID: {}", messageId);
+
         // find the message
         Message existingMessage = messageRepository.findById(messageId).orElse(null);
 
         // check to see if message ID exists
         if (existingMessage == null) {
+            logger.warn("Message update failed: Message not found with ID: {}", messageId);
             throw new InvalidMessageException("Message with ID: " + messageId + " does not exist");
         }
 
         // check to see if the message text is valid
         if (newMessageText == null || newMessageText.isBlank()) {
+            logger.warn("Message update failed: New text is blank for message ID: {}", messageId);
             throw new InvalidMessageException("Message text cannot be blank");
         }
         if (newMessageText.length() > 255) {
+            logger.warn("Message update failed: New text too long ({} chars) for message ID: {}",
+                    newMessageText.length(), messageId);
             throw new InvalidMessageException("Message text must be less than 255 characters");
         }
 
         // update message text
+        logger.debug("Message validation successful, proceeding with update");
         existingMessage.setMessageText(newMessageText);
 
         // save the message
         messageRepository.save(existingMessage);
+        logger.info("Updated message with ID: {}", messageId);
 
         return 1;
     }
@@ -145,6 +186,9 @@ public class MessageService {
      * @return a list of messages posted by the specified account, or an empty list if no messages exist.
      */
     public List<Message> getMessagesByAccountId(Integer accountId) {
-        return messageRepository.findMessagesByPostedBy(accountId);
+        logger.debug("Retrieving messages for user ID: {}", accountId);
+        List<Message> messages = messageRepository.findMessagesByPostedBy(accountId);
+        logger.debug("Retrieved {} messages for user ID: {}", messages.size(), accountId);
+        return messages;
     }
 }

@@ -5,6 +5,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * GlobalExceptionHandler is a centralized exception handling class for the application.
  * It handles various types of exceptions thrown by the application and maps them
@@ -13,6 +16,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
  */
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+    private static final Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
     /**
      * Handles the exception when a duplicate username is detected in the system.
@@ -25,6 +29,7 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(DuplicateUsernameException.class)
     public ResponseEntity<Object> handleDuplicateUsername(DuplicateUsernameException e) {
+        logger.warn("Duplicate username exception: {}", e.getMessage());
         return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
     }
 
@@ -39,6 +44,7 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(InvalidPasswordException.class)
     public ResponseEntity<Object> handleInvalidPassword(InvalidPasswordException e) {
+        logger.warn("Invalid password exception: {}", e.getMessage());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
     }
 
@@ -53,6 +59,7 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(InvalidUsernameException.class)
     public ResponseEntity<Object> handleInvalidUsername(InvalidUsernameException e) {
+        logger.warn("Invalid username exception: {}", e.getMessage());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
     }
 
@@ -67,6 +74,7 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(AuthenticationFailedException.class)
     public ResponseEntity<Object> handleAuthenticationFailed(AuthenticationFailedException e) {
+        logger.warn("Authentication failed exception: {}", e.getMessage());
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
     }
 
@@ -81,6 +89,7 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(InvalidMessageException.class)
     public ResponseEntity<Object> handleInvalidMessage(InvalidMessageException e) {
+        logger.warn("Invalid message exception: {}", e.getMessage());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
     }
 
@@ -95,6 +104,7 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Object> handleUnexpectedException(Exception e) {
+        logger.error("Unexpected exception: {}", e.getMessage(), e);
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body("An unexpected error occurred: " + e.getMessage());
     }
